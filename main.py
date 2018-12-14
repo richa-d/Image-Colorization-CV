@@ -40,7 +40,7 @@ else:
 
 ### Data Initialization and Loading
 from data import initialize_data, data_transforms, vgg_train_transform, resnet_train_transform # data.py in the same folder
-# initialize_data(args.data) # extracts the zip files, makes a validation set
+initialize_data(args.data) # extracts the zip files, makes a validation set
 
 train_loader = torch.utils.data.DataLoader(
     datasets.ImageFolder(args.data + '/train',
@@ -153,9 +153,17 @@ def validation():
     for data, target in val_loader:
         data, target = (Variable(data, volatile=True)), (Variable(target))
         data_lab = colors.rgb_to_lab(data)
-        data_l = data_lab[0]
-        target = data_lab
+        data_l = data_lab[:,0,:,:].unsqueeze(1)
+        # print("L",end="")
+        # print(data_l.size())
+        data_ab = data_lab[:,1:,:,:]
+        # data_lab = colors.rgb_to_lab(data)
+        # data_l = data_lab[0]
+        # target = data_lab
         output = model(data_l)
+        # data_l = data_lab[0]
+        # target = data_lab
+        # output = model(data_l)
         # output = model(data)
         # validation_loss += F.nll_loss(output, target, size_average=False).data[0] # sum up batch loss
         validation_loss += criterion(output, target).data[0]

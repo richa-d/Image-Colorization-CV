@@ -159,7 +159,7 @@ def validation():
         data_ab = data_lab[:,1:,:,:]
         # data_lab = colors.rgb_to_lab(data)
         # data_l = data_lab[0]
-        # target = data_lab
+        target = data_ab
         output = model(data_l)
         # data_l = data_lab[0]
         # target = data_lab

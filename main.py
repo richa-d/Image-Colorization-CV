@@ -40,17 +40,17 @@ else:
 
 ### Data Initialization and Loading
 from data import initialize_data, data_transforms, vgg_train_transform, resnet_train_transform # data.py in the same folder
-initialize_data(args.data) # extracts the zip files, makes a validation set
+# initialize_data(args.data) # extracts the zip files, makes a validation set
 
 train_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/train',
+    datasets.ImageFolder(args.data + '/train_lab',
                          transform=data_transforms),
                          # transform=vgg_train_transform),
                          # transform=resnet_train_transform),
     batch_size=args.batch_size, shuffle=True, num_workers=1)
 
 val_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/val',
+    datasets.ImageFolder(args.data + '/val_lab',
                          transform=data_transforms),
                          # transform=vgg_train_transform),
                          # transform=resnet_train_transform),

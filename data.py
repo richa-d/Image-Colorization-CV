@@ -11,7 +11,7 @@ import torchvision.transforms as transforms
 data_transforms = transforms.Compose([
     transforms.Resize((128, 128)),
     transforms.ToTensor(),
-    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+    transforms.Normalize([0.5484779, 0.5317458, 0.5059532], [0.3107016, 0.30501202, 0.3177048])
 ])
 
 resnet_train_transform = transforms.Compose([

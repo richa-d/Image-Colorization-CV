@@ -12,6 +12,7 @@ from skimage import color
 import numpy as np
 import pytorch_colors as colors
 from PIL import Image
+import cv2
 
 
 # Training settings
@@ -148,7 +149,8 @@ def train(epoch):
         # data_np = data.numpy()
         # data_lab_np = color.rgb2lab(data_np)
         # data_lab = torch.from_numpy(data_lab_np
-        data_lab = colors.rgb_to_lab(data)
+        # data_lab = colors.rgb_to_lab(data)
+        data_lab = data
         # print("LAB",end="")
         # print(data_lab.size())
         data_l = data_lab[:,0,:,:].unsqueeze(1)
@@ -188,7 +190,7 @@ def validation():
     for data, target in val_loader:
         with torch.no_grad():
             data, target = (Variable(data, volatile=True)), (Variable(target))
-            data_lab = colors.rgb_to_lab(data)
+            data_lab = data
             data_l = data_lab[:,0,:,:].unsqueeze(1)
             output_l=data_lab[:,0,:,:]
             # print("L",end="")
@@ -215,7 +217,7 @@ def validation():
             # print(output_a.size())
             # print("Predicted_B",end="")
             # print(output_b.size())
-            final_output=torch.stack([output_l,output_a,output_b],dim=1)
+            final_output = torch.stack([output_l,output_a,output_b],dim=1)
             # print("Predicted_Image",end="")
             # print(final_output.size())
             # new = final_output[0].permute(1, 2, 0)
@@ -240,16 +242,20 @@ for epoch in range(1, args.epochs + 1):
 
 i=0
 for new_image in newimage_array:
+    print("Final")
     i+=1
     # print(new_image.size())
     # print(new_image.type())
-    rgb_pred_image = colors.lab_to_rgb(new_image.unsqueeze(0))
+    # new_image1 = new_image.permute(1,2,0)
+    # rgb_pred_image = colors.lab_to_rgb(new_image.unsqueeze(0))
+    #cv2.cvtColor(new_image1.numpy(), cv2.COLOR_LAB2RGB)
     # print(rgb_pred_image.size())
-    # new = rgb_pred_image[0].permute(1, 2, 0)
-    # plt.imshow(new)
+    # plt.imshow(rgb_pred_image[0].permute(1,2,0))
     # plt.show()
-    s=args.data+"/img/iimages"+str(i)+".jpeg"
-    utils.save_image(rgb_pred_image[0],s)
+    # plt.imshow(new_image.permute(1,2,0))
+    # plt.show()
+    s = args.data+"/img/images"+str(i)+".jpeg"
+    utils.save_image(new_image,s)
 
 
 # plt.plot(tr_acc)

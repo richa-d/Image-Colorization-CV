@@ -41,17 +41,17 @@ else:
 
 ### Data Initialization and Loading
 from data import initialize_data, data_transforms, vgg_train_transform, resnet_train_transform # data.py in the same folder
-# initialize_data(args.data) # extracts the zip files, makes a validation set
+initialize_data(args.data) # extracts the zip files, makes a validation set
 
 train_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/train_lab',
+    datasets.ImageFolder(args.data + '/train',
                          transform=data_transforms),
                          # transform=vgg_train_transform),
                          # transform=resnet_train_transform),
     batch_size=args.batch_size, shuffle=True, num_workers=1)
 
 val_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/val_lab',
+    datasets.ImageFolder(args.data + '/val',
                          transform=data_transforms),
                          # transform=vgg_train_transform),
                          # transform=resnet_train_transform),
@@ -149,22 +149,29 @@ def train(epoch):
         # data_np = data.numpy()
         # data_lab_np = color.rgb2lab(data_np)
         # data_lab = torch.from_numpy(data_lab_np
-        # data_lab = colors.rgb_to_lab(data)
-        data_lab = data
+        data = data/255.0
+        data_lab = colors.rgb_to_lab(data)
+        # data_lab = data
         # print("LAB",end="")
         # print(data_lab.size())
         data_l = data_lab[:,0,:,:].unsqueeze(1)
-        # print("L",end="")
-        # print(data_l.size())
         data_ab = data_lab[:,1:,:,:]
         # print(data_ab)
-        target = data_ab
+        target = data_ab/128.0
         # print("AB",end="")
         # print(target.size())
         output = model(data_l)
         # print("Output",end="")
         # print(output.size())
         # output = model(data)
+        # new = data_lab[0].permute(1, 2, 0)
+        # plt.imshow(new)
+        # plt.show()
+        # print("L",end="")
+        # print(data_l[0].size())
+        # image_data_l = data_l[0]
+        # plt.imshow(image_data_l[0],cmap='gray')
+        # plt.show()
         # loss = F.nll_loss(output, target)
         loss = criterion(output, target)
         loss.backward()
@@ -181,24 +188,28 @@ def train(epoch):
                 100. * batch_idx / len(train_loader), loss.data[0]))
     return correct
 
+i=0
 # newimage_array=torch.empty()
 newimage_array=[]
 def validation():
     model.eval()
     validation_loss = 0
     correct = 0
+    global i
     for data, target in val_loader:
         with torch.no_grad():
+            i+=1
             data, target = (Variable(data, volatile=True)), (Variable(target))
-            data_lab = data
+            data = data/255.0
+            data_lab = colors.rgb_to_lab(data)
             data_l = data_lab[:,0,:,:].unsqueeze(1)
-            output_l=data_lab[:,0,:,:]
+            output_l = data_lab[:,0,:,:]
             # print("L",end="")
             # print(data_l.size())
             data_ab = data_lab[:,1:,:,:]
             # data_lab = colors.rgb_to_lab(data)
             # data_l = data_lab[0]
-            target = data_ab.float()
+            target = data_ab/128.0
             output = model(data_l)
             # data_l = data_lab[0]
             # target = data_lab
@@ -209,8 +220,8 @@ def validation():
             # pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
             # correct += pred.eq(target.data.view_as(pred)).sum()
             #Compare original LAB vs data_l+output(for ab)
-            output_a=output[:,0,:,:].detach()
-            output_b=output[:,1,:,:].detach()
+            output_a = output[:,0,:,:].detach() *128.0
+            output_b = output[:,1,:,:].detach() *128.0
             # print("Actual_L",end="")
             # print(output_l.size())
             # print("Predicted_A",end="")
@@ -219,10 +230,18 @@ def validation():
             # print(output_b.size())
             final_output = torch.stack([output_l,output_a,output_b],dim=1)
             # print("Predicted_Image",end="")
-            # print(final_output.size())
-            # new = final_output[0].permute(1, 2, 0)
+            print(final_output.size())
+            new = final_output[0].permute(1, 2, 0)
+            # print(new.size())
+            num = new.numpy()
+            final_rgb = cv2.cvtColor(num,cv2.COLOR_LAB2RGB)
+            # print(final_rgb.size())
             # plt.imshow(new)
             # plt.show()
+            # print(final_rgb.size())
+            s = args.data+"/img/images"+str(i)+".jpeg"
+            utils.save_image(final_output[0],s)
+            # cv2.imwrite(s,final_rgb)
             newimage_array.append(final_output[0])
     validation_loss /= len(val_loader.dataset)
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
@@ -240,22 +259,22 @@ for epoch in range(1, args.epochs + 1):
     torch.save(model.state_dict(), model_file)
     print('\nSaved model to ' + model_file + '. You can run `python evaluate.py --model' + model_file + '` to generate the Kaggle formatted csv file')
 
-i=0
-for new_image in newimage_array:
-    print("Final")
-    i+=1
-    # print(new_image.size())
-    # print(new_image.type())
-    # new_image1 = new_image.permute(1,2,0)
-    # rgb_pred_image = colors.lab_to_rgb(new_image.unsqueeze(0))
-    #cv2.cvtColor(new_image1.numpy(), cv2.COLOR_LAB2RGB)
-    # print(rgb_pred_image.size())
-    # plt.imshow(rgb_pred_image[0].permute(1,2,0))
-    # plt.show()
-    # plt.imshow(new_image.permute(1,2,0))
-    # plt.show()
-    s = args.data+"/img/images"+str(i)+".jpeg"
-    utils.save_image(new_image,s)
+# i=0
+# for new_image in newimage_array:
+#     print("Final")
+#     i+=1
+#     # print(new_image.size())
+#     # print(new_image.type())
+#     # new_image1 = new_image.permute(1,2,0)
+#     # rgb_pred_image = colors.lab_to_rgb(new_image.unsqueeze(0))
+#     #cv2.cvtColor(new_image1.numpy(), cv2.COLOR_LAB2RGB)
+#     # print(rgb_pred_image.size())
+#     # plt.imshow(rgb_pred_image[0].permute(1,2,0))
+#     # plt.show()
+#     # plt.imshow(new_image.permute(1,2,0))
+#     # plt.show()
+#     s = args.data+"/img/images"+str(i)+".jpeg"
+#     utils.save_image(new_image,s)
 
 
 # plt.plot(tr_acc)

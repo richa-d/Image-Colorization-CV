@@ -23,18 +23,18 @@ from PIL import Image
 # In[ ]:
 
 # TO RESIZE TRAIN IMAGES TO 400 X 400
-# # img_list = []
-# for root, dirs, files in os.walk('/scratch/rsd352/proj_cv/data/train'):
-#      for file in files:
-# #         print(os.path.join(root, file))
-#         if file[-3:] == 'jpg':
-#             im_path = os.path.join(root, file)
+# img_list = []
+for root, dirs, files in os.walk('/scratch/rsd352/proj_cv/data/train'):
+     for file in files:
+#         print(os.path.join(root, file))
+        if file[-3:] == 'jpg':
+            im_path = os.path.join(root, file)
 #             print(im_path)
-#             img = Image.open(im_path)
-#             img = img.resize((400, 400), Image.ANTIALIAS)
-#           #   img_list.append(img)
-#             img.save(im_path) 
-# # print(len(img_list))
+            img = Image.open(im_path)
+            img = img.resize((400, 400), Image.ANTIALIAS)
+          #   img_list.append(img)
+            img.save(im_path) 
+print(len(img_list))
 
 
 # # In[22]:
@@ -46,18 +46,18 @@ from PIL import Image
 # # In[49]:
 
 # TO RESIZE VAL IMAGES TO 400 X 400
-# # vimg_list = []
-# for root, dirs, files in os.walk('/scratch/rsd352/proj_cv/data/val'):
-#      for file in files:
-# #         print(os.path.join(root, file))
-#         if file[-3:] == 'jpg':
-#             im_path = os.path.join(root, file)
+# vimg_list = []
+for root, dirs, files in os.walk('/scratch/rsd352/proj_cv/data/val'):
+     for file in files:
+#         print(os.path.join(root, file))
+        if file[-3:] == 'jpg':
+            im_path = os.path.join(root, file)
 #             print(im_path)
-#             img = Image.open(im_path)
-#             img = img.resize((400, 400), Image.ANTIALIAS)
-#             vimg_list.append(img)
-#             img.save(im_path) 
-# print(len(vimg_list))
+            img = Image.open(im_path)
+            img = img.resize((400, 400), Image.ANTIALIAS)
+            vimg_list.append(img)
+            img.save(im_path) 
+print(len(vimg_list))
 
 
 # In[4]:

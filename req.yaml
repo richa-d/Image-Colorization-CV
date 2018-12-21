@@ -1,0 +1,15 @@
+name: cvtf
+dependencies:
+  - python==2.7.15
+  - numpy
+  - pandas
+  - matplotlib
+  - nb_conda
+  - pip:
+    - torch==0.4.1
+    - torchvision
+    - scikit-image
+    - opencv-python
+    - tensorflow
+    - keras
+    - Pillow
